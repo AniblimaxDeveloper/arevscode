@@ -269,7 +269,7 @@ class GeminiCopilot(private val prefs: Prefs) {
         val model = prefs.model.ifBlank { "gemini-3.8-flash" }
 
         val instruction =
-            "You are arevscode Copilot, an expert mobile software engineering assistant. " +
+            "You are Avescode Copilot, an expert mobile software engineering assistant. " +
             "Be precise. Diagnose errors, propose safe edits, explain why, and return " +
             "copy-pasteable code when useful.\n\n" +
             "User request:\n$prompt\n\n" +
@@ -341,7 +341,7 @@ fun ArevscodeApp() {
     var terminalOutput by remember {
         mutableStateOf(
             listOf(
-                "arevscode terminal ready",
+                "Avescode terminal ready",
                 "Type 'help' or any shell command."
             )
         )
@@ -456,7 +456,7 @@ fun ArevscodeApp() {
                                 terminalBusy = true
                                 terminalOutput =
                                     terminalOutput +
-                                        "arev@arevscode:${shell.pwd().substringAfterLast("/")} $cmd"
+                                        "aves@Avescode:${shell.pwd().substringAfterLast("/")} $cmd"
                                 terminalInput = ""
 
                                 scope.launch(Dispatchers.IO) {
@@ -1832,9 +1832,9 @@ fun EmptyState(
     }
 }
 
-private const val WELCOME_CODE = """# Welcome to arevscode
+private const val WELCOME_CODE = """# Welcome to Avescode
 
-// arevscode v0.2.0
+// Avescode v0.2.0
 // 1. Open a project in Explorer
 // 2. Create files and folders
 // 3. Edit code and save changes
