@@ -391,8 +391,6 @@ fun ArevscodeApp() {
             ResponsiveShell(
                 screen = Screen.valueOf(screen),
                 onNavigate = { screen = it.name },
-                title = project.rootName,
-                onSettings = { screen = Screen.Settings.name }
             ) {
                 when (Screen.valueOf(screen)) {
                     Screen.Home -> HomeScreen(
@@ -523,11 +521,10 @@ fun ArevscodeApp() {
 }
 
 @Composable
+@Composable
 fun ResponsiveShell(
     screen: Screen,
     onNavigate: (Screen) -> Unit,
-    title: String,
-    onSettings: () -> Unit,
     content: @Composable () -> Unit
 ) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -571,21 +568,15 @@ fun ResponsiveShell(
                     }
                 }
 
-                Column(Modifier.fillMaxSize()) {
-                    TopBar(title, onSettings)
-                    Box(
-                        Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                    ) {
-                        content()
-                    }
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                ) {
+                    content()
                 }
             }
         } else {
             Column(Modifier.fillMaxSize()) {
-                TopBar(title, onSettings)
-
                 Box(
                     Modifier
                         .weight(1f)
@@ -602,7 +593,8 @@ fun ResponsiveShell(
                         Screen.Explorer,
                         Screen.Editor,
                         Screen.Terminal,
-                        Screen.Copilot
+                        Screen.Copilot,
+                        Screen.Settings
                     ).forEach { item ->
                         NavigationBarItem(
                             selected = screen == item,
@@ -616,7 +608,7 @@ fun ResponsiveShell(
                             label = {
                                 Text(
                                     item.label,
-                                    fontSize = 10.sp
+                                    fontSize = 9.sp
                                 )
                             }
                         )
@@ -827,7 +819,7 @@ fun HomeScreen(
         Spacer(Modifier.weight(1f))
 
         Text(
-            "Avescode • v0.4.1",
+            "Avescode • v0.4.2",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 10.sp
         )
