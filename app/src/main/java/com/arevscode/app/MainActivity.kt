@@ -18,12 +18,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -96,10 +98,22 @@ class ProjectStore(private val context: Context) {
 
     fun listCurrent(): List<WorkspaceFile> {
         val uri = currentUri ?: rootUri ?: return emptyList()
-        val doc = DocumentFile.fromTreeUri(context, uri) ?: DocumentFile.fromSingleUri(context, uri) ?: return emptyList()
-        return doc.listFiles().map { file -> WorkspaceFile(file.name.orEmpty().ifBlank { "Unnamed" }, file.uri, file.isDirectory) }.sortedWith(compareBy<WorkspaceFile> { !it.directory }.thenBy { it.name.lowercase() })
-            WorkspaceFile(it.name ?: "Unnamed", it.uri, it.isDirectory)
-        }
+        val doc = DocumentFile.fromTreeUri(context, uri)
+            ?: DocumentFile.fromSingleUri(context, uri)
+            ?: return emptyList()
+
+        return doc.listFiles()
+            .map { file ->
+                WorkspaceFile(
+                    name = file.name.orEmpty().ifBlank { "Unnamed" },
+                    uri = file.uri,
+                    directory = file.isDirectory
+                )
+            }
+            .sortedWith(
+                compareBy<WorkspaceFile> { !it.directory }
+                    .thenBy { it.name.lowercase() }
+            )
     }
 
     fun enter(uri: Uri) {
