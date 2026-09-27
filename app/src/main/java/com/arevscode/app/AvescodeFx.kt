@@ -11,65 +11,69 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 
+/*
+ * Performance rule:
+ * - Only the page background animates.
+ * - Card borders are static gradients.
+ * - No infinite animation is created per card.
+ */
 @Composable
 fun AvescodeAnimatedBackdrop() {
-    val transition = rememberInfiniteTransition(label = "avescode-rgb")
+    val transition = rememberInfiniteTransition(label = "avescode-backdrop")
     val shift by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(9000, easing = LinearEasing),
+            animation = tween(12000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "rgb-shift"
+        label = "backdrop-shift"
     )
 
-    Canvas(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        drawRect(
-            color = Color(0xFF06080D)
-        )
+    Canvas(Modifier.fillMaxSize()) {
+        drawRect(Color(0xFF06080D))
 
         val w = size.width
         val h = size.height
 
         drawCircle(
-            color = Color(0xFF00E5FF).copy(alpha = 0.08f),
-            radius = w * 0.58f,
+            color = Color(0xFF00E5FF).copy(alpha = 0.055f),
+            radius = w * 0.52f,
             center = Offset(
-                x = w * (0.18f + 0.40f * shift),
-                y = h * 0.14f
+                x = w * (0.18f + 0.32f * shift),
+                y = h * 0.12f
             )
         )
 
         drawCircle(
-            color = Color(0xFF7C4DFF).copy(alpha = 0.09f),
-            radius = w * 0.56f,
+            color = Color(0xFF7C4DFF).copy(alpha = 0.065f),
+            radius = w * 0.50f,
             center = Offset(
-                x = w * (0.82f - 0.35f * shift),
+                x = w * (0.82f - 0.30f * shift),
                 y = h * 0.78f
             )
         )
 
         drawCircle(
-            color = Color(0xFFFF2DCB).copy(alpha = 0.055f),
-            radius = w * 0.45f,
+            color = Color(0xFFFF2DCB).copy(alpha = 0.035f),
+            radius = w * 0.38f,
             center = Offset(
                 x = w * 0.50f,
-                y = h * (0.42f + 0.16f * shift)
+                y = h * (0.44f + 0.10f * shift)
             )
         )
     }
@@ -80,15 +84,16 @@ fun AvescodeRgbEdge(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val transition = rememberInfiniteTransition(label = "avescode-edge")
-    val shift by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(6500, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "edge-shift"
+    /*
+     * Static edge: this avoids spawning an animation per surface/card.
+     * The page-level backdrop above provides the motion.
+     */
+    val brush = Brush.linearGradient(
+        listOf(
+            Color(0xFF00E5FF).copy(alpha = 0.55f),
+            Color(0xFF7C4DFF).copy(alpha = 0.50f),
+            Color(0xFFFF2DCB).copy(alpha = 0.45f)
+        )
     )
 
     val shape = RoundedCornerShape(18.dp)
@@ -97,25 +102,15 @@ fun AvescodeRgbEdge(
         modifier = modifier
             .clip(shape)
             .drawBehind {
-                val brush = Brush.sweepGradient(
-                    0f to Color(0xFF00E5FF).copy(alpha = 0.85f),
-                    0.33f to Color(0xFF7C4DFF).copy(alpha = 0.85f),
-                    0.66f to Color(0xFFFF2DCB).copy(alpha = 0.85f),
-                    1f to Color(0xFF00E5FF).copy(alpha = 0.85f)
-                )
-
                 val inset = 1.dp.toPx()
                 drawRoundRect(
                     brush = brush,
-                    topLeft = androidx.compose.ui.geometry.Offset(
-                        inset * shift,
-                        inset
-                    ),
-                    size = androidx.compose.ui.geometry.Size(
+                    topLeft = Offset(inset, inset),
+                    size = Size(
                         size.width - inset * 2f,
                         size.height - inset * 2f
                     ),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(
+                    cornerRadius = CornerRadius(
                         18.dp.toPx(),
                         18.dp.toPx()
                     )
@@ -132,7 +127,7 @@ fun AvescodeSurface(
     content: @Composable BoxScope.() -> Unit
 ) {
     AvescodeRgbEdge(
-        modifier = modifier,
+        modifier = modifier
     ) {
         Box(
             Modifier

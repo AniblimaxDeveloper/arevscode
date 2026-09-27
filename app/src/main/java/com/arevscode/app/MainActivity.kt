@@ -355,7 +355,7 @@ fun ArevscodeApp() {
             listOf(
                 ChatMessage(
                     false,
-                    "Hai 👋 Saya Copilot arevscode. Saya dapat membantu memperbaiki error, menjelaskan kode, atau membuat fitur baru."
+                    "Hai 👋 Saya Copilot Avescode. Saya dapat membantu memperbaiki error, menjelaskan kode, atau membuat fitur baru."
                 )
             )
         )
@@ -391,7 +391,8 @@ fun ArevscodeApp() {
             ResponsiveShell(
                 screen = Screen.valueOf(screen),
                 onNavigate = { screen = it.name },
-                title = project.rootName
+                title = project.rootName,
+                onSettings = { screen = Screen.Settings.name }
             ) {
                 when (Screen.valueOf(screen)) {
                     Screen.Home -> HomeScreen(
@@ -526,6 +527,7 @@ fun ResponsiveShell(
     screen: Screen,
     onNavigate: (Screen) -> Unit,
     title: String,
+    onSettings: () -> Unit,
     content: @Composable () -> Unit
 ) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -535,11 +537,11 @@ fun ResponsiveShell(
             Row(Modifier.fillMaxSize()) {
                 NavigationRail(
                     containerColor = Color(0xFF0B0D13),
-                    modifier = Modifier.width(76.dp)
+                    modifier = Modifier.width(78.dp)
                 ) {
                     Spacer(Modifier.height(16.dp))
                     LogoMark()
-                    Spacer(Modifier.height(22.dp))
+                    Spacer(Modifier.height(20.dp))
 
                     listOf(
                         Screen.Home,
@@ -549,30 +551,48 @@ fun ResponsiveShell(
                         Screen.GitHub,
                         Screen.Copilot,
                         Screen.Settings
-                    ).forEach {
+                    ).forEach { item ->
                         NavigationRailItem(
-                            selected = screen == it,
-                            onClick = { onNavigate(it) },
-                            icon = { Text(it.glyph, fontSize = 18.sp) },
-                            label = null,
-                            alwaysShowLabel = false
+                            selected = screen == item,
+                            onClick = { onNavigate(item) },
+                            icon = {
+                                Text(
+                                    item.glyph,
+                                    fontSize = 18.sp
+                                )
+                            },
+                            label = {
+                                Text(
+                                    item.label,
+                                    fontSize = 9.sp
+                                )
+                            }
                         )
                     }
                 }
 
                 Column(Modifier.fillMaxSize()) {
-                    TopBar(title)
+                    TopBar(title, onSettings)
                     Box(
-                        Modifier.weight(1f).fillMaxWidth()
-                    ) { content() }
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        content()
+                    }
                 }
             }
         } else {
             Column(Modifier.fillMaxSize()) {
-                TopBar(title)
+                TopBar(title, onSettings)
+
                 Box(
-                    Modifier.weight(1f).fillMaxWidth()
-                ) { content() }
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    content()
+                }
 
                 NavigationBar(
                     containerColor = Color(0xFF0B0D13)
@@ -583,12 +603,22 @@ fun ResponsiveShell(
                         Screen.Editor,
                         Screen.Terminal,
                         Screen.Copilot
-                    ).forEach {
+                    ).forEach { item ->
                         NavigationBarItem(
-                            selected = screen == it,
-                            onClick = { onNavigate(it) },
-                            icon = { Text(it.glyph, fontSize = 16.sp) },
-                            label = { Text(it.label, fontSize = 10.sp) }
+                            selected = screen == item,
+                            onClick = { onNavigate(item) },
+                            icon = {
+                                Text(
+                                    item.glyph,
+                                    fontSize = 16.sp
+                                )
+                            },
+                            label = {
+                                Text(
+                                    item.label,
+                                    fontSize = 10.sp
+                                )
+                            }
                         )
                     }
                 }
@@ -596,42 +626,49 @@ fun ResponsiveShell(
         }
     }
 }
-
 @Composable
-fun TopBar(title: String) {
+fun TopBar(
+    title: String,
+    onSettings: () -> Unit
+) {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(Color(0xFF0B0D13))
-            .padding(horizontal = 18.dp, vertical = 12.dp),
+            .background(Color(0xE60B0D13))
+            .padding(horizontal = 14.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         LogoMark(compact = true)
-        Spacer(Modifier.width(12.dp))
+
+        Spacer(Modifier.width(10.dp))
 
         Column(Modifier.weight(1f)) {
             Text(
-                "arevscode",
-                fontWeight = FontWeight.Bold,
+                "Avescode",
+                fontWeight = FontWeight.ExtraBold,
                 fontSize = 17.sp
             )
+
             Text(
                 title,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 11.sp
+                fontSize = 10.sp
             )
         }
 
-        Text("●", color = Color(0xFF3DDC84), fontSize = 10.sp)
-        Spacer(Modifier.width(7.dp))
-        Text(
-            "Ready",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 11.sp
-        )
+        SmallPill("● Ready")
+
+        IconButton(
+            onClick = onSettings
+        ) {
+            Text(
+                "⚙",
+                fontSize = 19.sp,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
     }
 }
-
 @Composable
 fun LogoMark(compact: Boolean = false) {
     Box(
@@ -661,9 +698,17 @@ fun Page(
 ) {
     Box(modifier.fillMaxSize()) {
         AvescodeAnimatedBackdrop()
+
         Column(
-            Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    start = 14.dp,
+                    end = 14.dp,
+                    top = 12.dp,
+                    bottom = 10.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             content = content
         )
     }
@@ -782,7 +827,7 @@ fun HomeScreen(
         Spacer(Modifier.weight(1f))
 
         Text(
-            "Avescode • v0.3.0",
+            "Avescode • v0.4.1",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 10.sp
         )
