@@ -97,7 +97,7 @@ class ProjectStore(private val context: Context) {
     fun listCurrent(): List<WorkspaceFile> {
         val uri = currentUri ?: rootUri ?: return emptyList()
         val doc = DocumentFile.fromTreeUri(context, uri) ?: DocumentFile.fromSingleUri(context, uri) ?: return emptyList()
-        return doc.listFiles().sortedWith(compareBy<WorkspaceFile> { !it.directory }.thenBy { it.name.lowercase() }).mapNotNull {
+        return doc.listFiles().sortedWith(compareBy<DocumentFile> { !it.isDirectory }.thenBy { it.name.lowercase() }).mapNotNull {
             WorkspaceFile(it.name ?: "Unnamed", it.uri, it.isDirectory)
         }
     }
