@@ -330,7 +330,7 @@ fun ArevscodeApp() {
     val prefs = remember { Prefs(context) }
     val project = remember { ProjectStore(context) }
     val shell = remember { ShellEngine(context) }
-    val copilot = remember { GeminiCopilot(prefs) }
+    val copilot = remember { GeminiTurbo(prefs) }
 
     var screen by rememberSaveable { mutableStateOf(Screen.Home.name) }
     var openFileName by rememberSaveable { mutableStateOf("Welcome.md") }
@@ -659,13 +659,15 @@ fun Page(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
-        modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-        content = content
-    )
+    Box(modifier.fillMaxSize()) {
+        AvescodeAnimatedBackdrop()
+        Column(
+            Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+            content = content
+        )
+    }
 }
-
 @Composable
 fun SectionTitle(kicker: String, title: String, sub: String? = null) {
     Column {
@@ -780,7 +782,7 @@ fun HomeScreen(
         Spacer(Modifier.weight(1f))
 
         Text(
-            "arevscode • v0.2.0",
+            "Avescode • v0.3.0",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 10.sp
         )
