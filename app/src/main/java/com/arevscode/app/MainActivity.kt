@@ -311,7 +311,9 @@ fun ArevscodeApp() {
                             prefs.model = settingsModel.trim().ifBlank { "gemini-3.8-flash" }
                             Toast.makeText(context, "Settings tersimpan", Toast.LENGTH_SHORT).show()
                         }, onSystemSettings = {
-                            context.startActivity(Intent(Settings.ACTION_APP_APPLICATION_DETAILS_SETTINGS).apply { data = Uri.parse("package:${context.packageName}") })
+                            val intent = Intent(Settings.ACTION_APP_APPLICATION_DETAILS_SETTINGS)
+                            intent.data = Uri.parse("package:${context.packageName}")
+                            context.startActivity(intent)
                         })
                     }
                 }
