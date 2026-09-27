@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="arev_black">#080A0F</color>
+    <color name="arev_surface">#10131A</color>
+    <color name="arev_surface_2">#151923</color>
+    <color name="arev_accent">#7C5CFF</color>
+    <color name="arev_cyan">#41D6FF</color>
+</resources>
