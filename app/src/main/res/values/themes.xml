@@ -8,7 +8,6 @@
         <item name="android:navigationBarColor">#020409</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowDisablePreview">false</item>
         <item name="android:windowBackground">#020409</item>
         <item name="android:colorAccent">#8B5CFF</item>
     </style>
