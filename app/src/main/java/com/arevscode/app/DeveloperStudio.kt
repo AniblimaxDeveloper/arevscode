@@ -1,5 +1,6 @@
 package com.arevscode.app
 
+import androidx.compose.foundation.verticalScroll
 import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
