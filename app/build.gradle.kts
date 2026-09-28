@@ -11,8 +11,8 @@ android {
         applicationId = "com.arevscode.app"
         minSdk = 26
         targetSdk = 37
-        versionCode = 5
-        versionName = "0.4.2"
+        versionCode = 6
+        versionName = "0.6.0"
     }
 
     buildTypes {

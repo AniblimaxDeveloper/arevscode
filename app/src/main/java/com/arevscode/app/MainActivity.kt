@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
 enum class Screen(val label: String, val glyph: String) {
     Home("Home", "⌂"),
     Explorer("Explorer", "▣"),
-    Editor("Editor", "✎"),
+    Editor("Studio", "✎"),
     Terminal("Terminal", "›_"),
     GitHub("GitHub", "◉"),
     Copilot("Copilot", "✦"),
@@ -331,6 +331,7 @@ fun ArevscodeApp() {
     val project = remember { ProjectStore(context) }
     val shell = remember { ShellEngine(context) }
     val copilot = remember { GeminiTurbo(prefs) }
+    val agent = remember { GeminiAgent(copilot) }
 
     var screen by rememberSaveable { mutableStateOf(Screen.Home.name) }
     var openFileName by rememberSaveable { mutableStateOf("Welcome.md") }
@@ -414,33 +415,18 @@ fun ArevscodeApp() {
                         onChoose = { folderPicker.launch(null) }
                     )
 
-                    Screen.Editor -> EditorScreen(
-                        fileName = openFileName,
-                        text = editorText,
-                        dirty = dirty,
-                        onChange = {
-                            editorText = it
-                            dirty = true
+                    Screen.Editor -> DeveloperStudio(
+                        project = project,
+                        agent = agent,
+                        onNavigate = {
+                            screen = it.name
                         },
-                        onSave = {
-                            if (openFileUriString.isNotBlank()) {
-                                val ok = project.writeText(
-                                    Uri.parse(openFileUriString),
-                                    editorText
-                                )
-                                dirty = !ok
-                                Toast.makeText(
-                                    context,
-                                    if (ok) "Saved" else "Save failed",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Open a file first",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                        onToast = {
+                            Toast.makeText(
+                                context,
+                                it,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     )
 
@@ -520,7 +506,6 @@ fun ArevscodeApp() {
     }
 }
 
-@Composable
 @Composable
 fun ResponsiveShell(
     screen: Screen,
