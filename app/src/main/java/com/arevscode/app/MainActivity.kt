@@ -79,7 +79,7 @@ class Prefs(context: Context) {
         set(value) = prefs.edit().putString("gemini_key", value).apply()
 
     var model: String
-        get() = prefs.getString("gemini_model", "gemini-3.8-flash") ?: "gemini-3.8-flash"
+        get() = prefs.getString("gemini_model", "gemini-3.5-flash") ?: "gemini-3.5-flash"
         set(value) = prefs.edit().putString("gemini_model", value).apply()
 }
 
@@ -266,7 +266,7 @@ class GeminiCopilot(private val prefs: Prefs) {
         val key = prefs.geminiKey.trim()
         if (key.isEmpty()) return "Masukkan Gemini API key di Settings terlebih dahulu."
 
-        val model = prefs.model.ifBlank { "gemini-3.8-flash" }
+        val model = prefs.model.ifBlank { "gemini-3.5-flash" }
 
         val instruction =
             "You are Avescode Copilot, an expert mobile software engineering assistant. " +
@@ -491,7 +491,7 @@ fun ArevscodeApp() {
                         onSave = {
                             prefs.geminiKey = settingsKey.trim()
                             prefs.model =
-                                settingsModel.trim().ifBlank { "gemini-3.8-flash" }
+                                settingsModel.trim().ifBlank { "gemini-3.5-flash" }
                             Toast.makeText(
                                 context,
                                 "Settings tersimpan",
@@ -682,7 +682,7 @@ fun Page(
                 .padding(
                     start = 14.dp,
                     end = 14.dp,
-                    top = 12.dp,
+                    top = 26.dp,
                     bottom = 10.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -1261,7 +1261,7 @@ fun EditorScreen(
             ) {
                 Column(
                     Modifier
-                        .padding(top = 12.dp)
+                        .padding(top = 26.dp)
                         .background(Color(0xFF0D1016))
                         .padding(horizontal = 11.dp),
                     horizontalAlignment = Alignment.End
