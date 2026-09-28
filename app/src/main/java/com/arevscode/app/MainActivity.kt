@@ -471,12 +471,24 @@ fun ArevscodeApp() {
                             if (prompt.isNotEmpty()) {
                                 chats = chats + ChatMessage(true, prompt)
                                 copilotInput = ""
-                                aiBusy = true
 
-                                scope.launch(Dispatchers.IO) {
-                                    val answer = copilot.ask(prompt, editorText)
-                                    chats = chats + ChatMessage(false, answer)
+                                if (prefs.geminiKey.trim().isEmpty()) {
+                                    chats = chats + ChatMessage(
+                                        false,
+                                        "Gemini API key belum diisi. Buka Settings → Gemini API key."
+                                    )
                                     aiBusy = false
+                                } else {
+                                    aiBusy = true
+
+                                    scope.launch(Dispatchers.IO) {
+                                        val answer = copilot.ask(
+                                            prompt,
+                                            editorText
+                                        )
+                                        chats = chats + ChatMessage(false, answer)
+                                        aiBusy = false
+                                    }
                                 }
                             }
                         },
