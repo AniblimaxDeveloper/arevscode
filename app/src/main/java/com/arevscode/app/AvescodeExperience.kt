@@ -624,10 +624,12 @@ private fun AvSystemCenter088(
             Column {
                 Text(
                     "AvOS Control Center",
-                    fontWeight = FontWeight.Black
+                    fontWeight =
+                        FontWeight.Black
                 )
+
                 Text(
-                    "Avescode 0.8.9 • Functional System",
+                    "Avescode 0.9.0 • Full System",
                     color = AvCyan,
                     fontSize = 10.sp
                 )
@@ -661,9 +663,12 @@ private fun AvSystemCenter088(
                     "AVOS PROFILE",
                     listOf(
                         "OS" to "AvOS 16.0",
-                        "CPU" to "AvCPU 16.0 Virtual",
-                        "GPU" to "AvGPU Ultra AI Max",
-                        "AI" to "Aves Neural Runtime"
+                        "CPU" to
+                            "AvCPU 16.0 Virtual",
+                        "GPU" to
+                            "AvGPU Ultra AI Max",
+                        "AI" to
+                            "Aves Neural Runtime"
                     )
                 )
 
@@ -671,7 +676,8 @@ private fun AvSystemCenter088(
                     "RUNTIME CONTROLS",
                     color = AvCyan,
                     fontSize = 9.sp,
-                    fontWeight = FontWeight.Black
+                    fontWeight =
+                        FontWeight.Black
                 )
 
                 AvToggle(
@@ -711,7 +717,7 @@ private fun AvSystemCenter088(
 
                 AvToggle(
                     "Safe Mode",
-                    "Disable decorative system effects",
+                    "Disable decorative effects",
                     safeMode,
                     onSafeMode
                 )
@@ -759,10 +765,77 @@ private fun AvSystemCenter088(
                 )
 
                 Text(
+                    "FILES & MEDIA",
+                    color = AvCyan,
+                    fontSize = 9.sp,
+                    fontWeight =
+                        FontWeight.Black
+                )
+
+                AvSystemSection(
+                    "ACCESS",
+                    listOf(
+                        "Media" to
+                            AvOSSystem.mediaAccessSummary(
+                                context
+                            ),
+                        "Workspace" to
+                            "Storage Access Framework"
+                    )
+                )
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.requestMediaAccess(
+                                context
+                            )
+                            snapshot =
+                                AvOSSystem.snapshot(
+                                    context
+                                )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Grant media")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openFiles(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Files")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openMediaPicker(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Media")
+                    }
+                }
+
+                Text(
                     "SYSTEM ACTIONS",
                     color = AvCyan,
                     fontSize = 9.sp,
-                    fontWeight = FontWeight.Black
+                    fontWeight =
+                        FontWeight.Black
                 )
 
                 Row(
@@ -826,14 +899,56 @@ private fun AvSystemCenter088(
 
                     OutlinedButton(
                         onClick = {
-                            AvOSSystem.openAppInfo(
+                            AvOSSystem.openBatteryOptimizationSettings(
                                 context
                             )
                         },
                         modifier =
                             Modifier.weight(1f)
                     ) {
-                        Text("App info")
+                        Text("Battery mode")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openStorageSettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Storage")
+                    }
+                }
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openNotificationSettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Notifications")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openDefaultApps(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Default apps")
                     }
 
                     OutlinedButton(
@@ -854,6 +969,60 @@ private fun AvSystemCenter088(
                     horizontalArrangement =
                         Arrangement.spacedBy(6.dp)
                 ) {
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openLanguageSettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Language")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openDateTimeSettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Date & time")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openAccessibilitySettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Accessibility")
+                    }
+                }
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openAppInfo(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Permissions")
+                    }
+
                     OutlinedButton(
                         onClick = {
                             AvOSSystem.shareDiagnostics(
@@ -882,18 +1051,22 @@ private fun AvSystemCenter088(
                     ) {
                         Text("Clear cache")
                     }
+                }
 
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.Center
+                ) {
                     OutlinedButton(
                         onClick = {
                             snapshot =
                                 AvOSSystem.snapshot(
                                     context
                                 )
-                        },
-                        modifier =
-                            Modifier.weight(1f)
+                        }
                     ) {
-                        Text("Refresh")
+                        Text("Refresh system state")
                     }
                 }
 
@@ -906,7 +1079,8 @@ private fun AvSystemCenter088(
                 )
             }
         },
-        containerColor = Color(0xF5161C26)
+        containerColor =
+            Color(0xF5161C26)
     )
 }
 
