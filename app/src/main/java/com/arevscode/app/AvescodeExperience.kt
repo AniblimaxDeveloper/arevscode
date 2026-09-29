@@ -910,6 +910,7 @@ private fun AvSystemCenter088(
     )
 }
 
+@Composable
 private fun AvSystemSection(
     title: String,
     rows: List<Pair<String, String>>
