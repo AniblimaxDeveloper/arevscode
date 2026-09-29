@@ -13,41 +13,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,14 +31,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-private val AvCyan = Color(0xFF35E7FF)
-private val AvPurple = Color(0xFF8B5CFF)
-private val AvPink = Color(0xFFFF4DD3)
-private val AvGreen = Color(0xFF59E7AA)
-private val AvCard = Color(0xE9131822)
-private val AvCard2 = Color(0xE90B1018)
+private val AvCyan = Color(0xFF39E8FF)
+private val AvBlue = Color(0xFF4A7BFF)
+private val AvPurple = Color(0xFF8D62FF)
+private val AvPink = Color(0xFFFF4FD7)
+private val AvGreen = Color(0xFF59E8A8)
+private val AvOrange = Color(0xFFFFB04B)
+private val AvRed = Color(0xFFFF5C72)
+private val AvSurface = Color(0xEA111823)
+private val AvSurface2 = Color(0xEA0B1018)
 
-private var splashConsumed = false
+private var splashConsumed088 = false
 
 @Composable
 fun AvescodeShellV2WithSplash(
@@ -76,195 +50,53 @@ fun AvescodeShellV2WithSplash(
     content: @Composable () -> Unit
 ) {
     var showSplash by rememberSaveable {
-        mutableStateOf(!splashConsumed)
+        mutableStateOf(!splashConsumed088)
     }
 
-    Box(Modifier.fillMaxSize()) {
-        AvescodeShellV2(
-            screen = screen,
-            onNavigate = onNavigate,
-            content = content
-        )
+    var showCenter by rememberSaveable { mutableStateOf(false) }
 
-        if (showSplash) {
-            AvescodeSplashOverlay {
-                splashConsumed = true
-                showSplash = false
-            }
-        }
-    }
-}
+    var performance by rememberSaveable { mutableStateOf(true) }
+    var aiBoost by rememberSaveable { mutableStateOf(true) }
+    var rgbMotion by rememberSaveable { mutableStateOf(true) }
+    var lowPower by rememberSaveable { mutableStateOf(false) }
+    var autoSave by rememberSaveable { mutableStateOf(true) }
+    var safeMode by rememberSaveable { mutableStateOf(false) }
+    var haptics by rememberSaveable { mutableStateOf(true) }
+    var smartCache by rememberSaveable { mutableStateOf(true) }
+    var backgroundTasks by rememberSaveable { mutableStateOf(true) }
+    var networkAssist by rememberSaveable { mutableStateOf(true) }
+    var compactMode by rememberSaveable { mutableStateOf(false) }
+    var immersive by rememberSaveable { mutableStateOf(true) }
 
-@Composable
-private fun AvescodeSplashOverlay(
-    onFinished: () -> Unit
-) {
-    val transition = rememberInfiniteTransition(label = "splash")
-    val pulse by transition.animateFloat(
-        initialValue = 0.93f,
-        targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                1000,
-                easing = FastOutSlowInEasing
-            ),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse"
-    )
-
-    val sweep by transition.animateFloat(
-        initialValue = -1f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                1800,
-                easing = LinearEasing
-            )
-        ),
-        label = "sweep"
-    )
-
-    LaunchedEffect(Unit) {
-        delay(2200L)
-        onFinished()
-    }
-
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(Color(0xFF020409))
-            .statusBarsPadding(),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            Modifier
-                .size(270.dp)
-                .graphicsLayer {
-                    translationX = sweep * 36f
-                    alpha = 0.7f
-                }
-                .background(
-                    Brush.radialGradient(
-                        listOf(
-                            AvCyan.copy(alpha = 0.14f),
-                            AvPurple.copy(alpha = 0.07f),
-                            Color.Transparent
-                        )
-                    )
-                )
-        )
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(9.dp)
-        ) {
-            Box(
-                Modifier
-                    .size(112.dp)
-                    .graphicsLayer {
-                        scaleX = pulse
-                        scaleY = pulse
-                    }
-                    .clip(RoundedCornerShape(30.dp))
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                AvCyan,
-                                AvPurple,
-                                AvPink
-                            )
-                        )
-                    )
-                    .padding(2.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(28.dp))
-                        .background(Color(0xFF070A11)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_avescode),
-                        contentDescription = "Avescode",
-                        modifier = Modifier.size(76.dp)
-                    )
-                }
-            }
-
-            Text(
-                "AVESCODE",
-                fontWeight = FontWeight.Black,
-                fontSize = 24.sp,
-                letterSpacing = 3.sp
-            )
-
-            Text(
-                "Developer Studio",
-                color = Color(0xFFAEB9CA),
-                fontSize = 12.sp
-            )
-
-            Text(
-                "AvOS 16.0",
-                color = AvCyan,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Box(
-                Modifier
-                    .width(150.dp)
-                    .height(3.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color(0xFF171E2A))
-            ) {
-                Box(
-                    Modifier
-                        .width(65.dp)
-                        .height(3.dp)
-                        .graphicsLayer {
-                            translationX = sweep * 42f
-                        }
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    Color.Transparent,
-                                    AvCyan,
-                                    AvPurple,
-                                    Color.Transparent
-                                )
-                            )
-                        )
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AvescodeShellV2(
-    screen: Screen,
-    onNavigate: (Screen) -> Unit,
-    content: @Composable () -> Unit
-) {
     BoxWithConstraints(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF05070B))
     ) {
-        if (maxWidth >= 700.dp) {
+        AvAnimatedBackground(
+            modifier = Modifier.fillMaxSize(),
+            enabled = rgbMotion && !safeMode && !lowPower
+        )
+
+        val wide = maxWidth >= 700.dp
+
+        if (wide) {
             Row(Modifier.fillMaxSize()) {
-                AvRail(screen, onNavigate)
+                AvRail088(
+                    screen = screen,
+                    onNavigate = onNavigate
+                )
 
                 Column(
                     Modifier
                         .fillMaxHeight()
                         .weight(1f)
                 ) {
-                    AvRibbon(screen)
+                    AvTopBar088(
+                        screen = screen,
+                        safeMode = safeMode,
+                        onCenter = { showCenter = true }
+                    )
 
                     Box(
                         Modifier
@@ -277,7 +109,11 @@ private fun AvescodeShellV2(
             }
         } else {
             Column(Modifier.fillMaxSize()) {
-                AvRibbon(screen)
+                AvTopBar088(
+                    screen = screen,
+                    safeMode = safeMode,
+                    onCenter = { showCenter = true }
+                )
 
                 Box(
                     Modifier
@@ -287,60 +123,184 @@ private fun AvescodeShellV2(
                     content()
                 }
 
-                AvBottomBar(screen, onNavigate)
+                AvBottomBar088(
+                    screen = screen,
+                    onNavigate = onNavigate
+                )
+            }
+        }
+
+        if (showCenter) {
+            AvSystemCenter088(
+                performance = performance,
+                aiBoost = aiBoost,
+                rgbMotion = rgbMotion,
+                lowPower = lowPower,
+                autoSave = autoSave,
+                safeMode = safeMode,
+                haptics = haptics,
+                smartCache = smartCache,
+                backgroundTasks = backgroundTasks,
+                networkAssist = networkAssist,
+                compactMode = compactMode,
+                immersive = immersive,
+                onPerformance = { performance = it },
+                onAiBoost = { aiBoost = it },
+                onRgbMotion = { rgbMotion = it },
+                onLowPower = { lowPower = it },
+                onAutoSave = { autoSave = it },
+                onSafeMode = { safeMode = it },
+                onHaptics = { haptics = it },
+                onSmartCache = { smartCache = it },
+                onBackgroundTasks = { backgroundTasks = it },
+                onNetworkAssist = { networkAssist = it },
+                onCompactMode = { compactMode = it },
+                onImmersive = { immersive = it },
+                onDismiss = { showCenter = false }
+            )
+        }
+
+        if (showSplash) {
+            AvSplash088 {
+                splashConsumed088 = true
+                showSplash = false
             }
         }
     }
 }
 
 @Composable
-private fun AvRibbon(screen: Screen) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .statusBarsPadding()
-            .padding(horizontal = 12.dp, vertical = 7.dp),
-        verticalAlignment = Alignment.CenterVertically
+private fun AvAnimatedBackground(
+    modifier: Modifier,
+    enabled: Boolean
+) {
+    val transition =
+        rememberInfiniteTransition(label = "system-rgb")
+
+    val phase by transition.animateFloat(
+        initialValue = -1f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                4200,
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "phase"
+    )
+
+    Box(
+        modifier.graphicsLayer {
+            alpha = if (enabled) 1f else 0.20f
+        }
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(
-                "AvOS 16.0",
-                color = AvCyan,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
-            )
+        Box(
+            Modifier
+                .size(390.dp)
+                .graphicsLayer {
+                    translationX = phase * 100f
+                    translationY = phase * -45f
+                    alpha = 0.20f
+                }
+                .background(
+                    Brush.radialGradient(
+                        listOf(
+                            AvCyan,
+                            AvBlue.copy(alpha = 0.42f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
 
-            Text(
-                when (screen) {
-                    Screen.Editor -> "Developer Studio"
-                    Screen.Copilot -> "AI Command Center"
-                    Screen.Settings -> "System Center"
-                    else -> screen.label
-                },
-                fontSize = 16.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            AvStatus("CPU", AvGreen)
-            AvStatus("GPU", AvPurple)
-            AvStatus("AI", AvPink)
-        }
+        Box(
+            Modifier
+                .align(Alignment.BottomEnd)
+                .size(370.dp)
+                .graphicsLayer {
+                    translationX = phase * -95f
+                    translationY = phase * 50f
+                    alpha = 0.17f
+                }
+                .background(
+                    Brush.radialGradient(
+                        listOf(
+                            AvPurple,
+                            AvPink.copy(alpha = 0.34f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
     }
 }
 
 @Composable
-private fun AvStatus(
-    label: String,
-    color: Color
+private fun AvTopBar088(
+    screen: Screen,
+    safeMode: Boolean,
+    onCenter: () -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(Color(0xBD070A10))
+            .statusBarsPadding()
+            .padding(horizontal = 12.dp, vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Text(
+                "AvOS 16.0",
+                color = AvCyan,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Black
+            )
+
+            Text(
+                when (screen) {
+                    Screen.Home -> "Avescode"
+                    Screen.Explorer -> "Workspace Explorer"
+                    Screen.Editor -> "Developer Studio"
+                    Screen.Terminal -> "Terminal Runtime"
+                    Screen.GitHub -> "GitHub Control"
+                    Screen.Copilot -> "AI Command Center"
+                    Screen.Settings -> "System Settings"
+                },
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 16.sp
+            )
+        }
+
+        if (safeMode) {
+            AvMiniChip("SAFE", AvOrange, onCenter)
+            Spacer(Modifier.width(4.dp))
+        }
+
+        AvMiniChip("CPU", AvGreen, onCenter)
+        Spacer(Modifier.width(4.dp))
+        AvMiniChip("GPU", AvPurple, onCenter)
+        Spacer(Modifier.width(4.dp))
+        AvMiniChip("AI", AvPink, onCenter)
+        Spacer(Modifier.width(4.dp))
+        AvMiniChip("⚙", AvCyan, onCenter)
+    }
+}
+
+@Composable
+private fun AvMiniChip(
+    text: String,
+    accent: Color,
+    onClick: () -> Unit
 ) {
     Row(
         Modifier
             .clip(RoundedCornerShape(50))
             .background(Color(0xFF101722))
+            .clickable(onClick = onClick)
             .padding(horizontal = 7.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -348,17 +308,22 @@ private fun AvStatus(
             Modifier
                 .size(5.dp)
                 .clip(RoundedCornerShape(50))
-                .background(color)
+                .background(accent)
         )
 
         Spacer(Modifier.width(4.dp))
 
-        Text(label, fontSize = 8.sp)
+        Text(
+            text,
+            color = Color(0xFFE7EEF8),
+            fontSize = 8.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
 @Composable
-private fun AvRail(
+private fun AvRail088(
     screen: Screen,
     onNavigate: (Screen) -> Unit
 ) {
@@ -374,19 +339,45 @@ private fun AvRail(
 
     NavigationRail(
         modifier = Modifier
-            .width(82.dp)
+            .width(84.dp)
             .fillMaxHeight()
             .statusBarsPadding()
             .navigationBarsPadding(),
-        containerColor = Color(0xFF070A10)
+        containerColor = Color(0xF4070A10)
     ) {
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(9.dp))
 
-        Text(
-            "AV",
-            color = AvCyan,
-            fontWeight = FontWeight.Black
-        )
+        Box(
+            Modifier
+                .size(42.dp)
+                .clip(RoundedCornerShape(13.dp))
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            AvCyan,
+                            AvPurple,
+                            AvPink
+                        )
+                    )
+                )
+                .padding(1.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF080B12)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "AV",
+                    color = AvCyan,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 10.sp
+                )
+            }
+        }
 
         Spacer(Modifier.height(10.dp))
 
@@ -394,16 +385,14 @@ private fun AvRail(
             NavigationRailItem(
                 selected = screen == item,
                 onClick = { onNavigate(item) },
-                icon = {
-                    Text(
-                        item.glyph,
-                        fontSize = 17.sp
-                    )
-                },
+                icon = { Text(item.glyph, fontSize = 17.sp) },
                 label = {
                     Text(
-                        if (item == Screen.Settings) "System"
-                        else item.label,
+                        when (item) {
+                            Screen.Editor -> "Studio"
+                            Screen.Settings -> "System"
+                            else -> item.label
+                        },
                         fontSize = 8.sp
                     )
                 }
@@ -413,7 +402,7 @@ private fun AvRail(
 }
 
 @Composable
-private fun AvBottomBar(
+private fun AvBottomBar088(
     screen: Screen,
     onNavigate: (Screen) -> Unit
 ) {
@@ -434,9 +423,7 @@ private fun AvBottomBar(
             NavigationBarItem(
                 selected = screen == item,
                 onClick = { onNavigate(item) },
-                icon = {
-                    Text(item.glyph, fontSize = 17.sp)
-                },
+                icon = { Text(item.glyph, fontSize = 17.sp) },
                 label = {
                     Text(
                         when (item) {
@@ -453,44 +440,81 @@ private fun AvBottomBar(
 }
 
 @Composable
-fun AvescodeHomeV2(
-    workspace: String,
-    onOpen: (Screen) -> Unit
-) {
-    Page {
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+private fun AvSplash088(onFinished: () -> Unit) {
+    val transition =
+        rememberInfiniteTransition(label = "splash-088")
+
+    val pulse by transition.animateFloat(
+        initialValue = 0.93f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                950,
+                easing = FastOutSlowInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse"
+    )
+
+    val sweep by transition.animateFloat(
+        initialValue = -1f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                1700,
+                easing = LinearEasing
+            )
+        ),
+        label = "sweep"
+    )
+
+    LaunchedEffect(Unit) {
+        delay(2300L)
+        onFinished()
+    }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color(0xFF020409)),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            Modifier
+                .size(310.dp)
+                .graphicsLayer {
+                    translationX = sweep * 42f
+                    alpha = 0.72f
+                }
+                .background(
+                    Brush.radialGradient(
+                        listOf(
+                            AvCyan.copy(alpha = 0.16f),
+                            AvPurple.copy(alpha = 0.08f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    "DEVELOPER OS",
-                    color = AvCyan,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    "Build. Run. Ship.",
-                    fontSize = 29.sp,
-                    fontWeight = FontWeight.Black
-                )
-
-                Text(
-                    "Avescode Developer Studio • mobile-first development",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 11.sp
-                )
-            }
-
             Box(
                 Modifier
-                    .size(70.dp)
-                    .clip(RoundedCornerShape(20.dp))
+                    .size(118.dp)
+                    .graphicsLayer {
+                        scaleX = pulse
+                        scaleY = pulse
+                    }
+                    .clip(RoundedCornerShape(32.dp))
                     .background(
                         Brush.linearGradient(
                             listOf(
                                 AvCyan,
+                                AvBlue,
                                 AvPurple,
                                 AvPink
                             )
@@ -502,254 +526,82 @@ fun AvescodeHomeV2(
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Color(0xFF070A10)),
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(Color(0xFF070A11)),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.ic_avescode),
+                        painter = painterResource(
+                            R.drawable.ic_avescode
+                        ),
                         contentDescription = "Avescode",
-                        modifier = Modifier.size(46.dp)
+                        modifier = Modifier.size(79.dp)
                     )
                 }
             }
-        }
 
-        Card(
-            Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = AvCard
-            ),
-            shape = RoundedCornerShape(22.dp)
-        ) {
-            Column(
-                Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(9.dp)
-            ) {
-                Text(
-                    "AvOS 16.0 Runtime",
-                    color = AvCyan,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(7.dp)
-                ) {
-                    AvMetric(
-                        "CPU",
-                        "AvCPU 16.0",
-                        Modifier.weight(1f)
-                    )
-                    AvMetric(
-                        "GPU",
-                        "AvGPU AI Max",
-                        Modifier.weight(1f)
-                    )
-                    AvMetric(
-                        "AI",
-                        "Neural",
-                        Modifier.weight(1f)
-                    )
-                }
-
-                Text(
-                    "Workspace • ${
-                        workspace.ifBlank { "No workspace" }
-                    }",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 10.sp
-                )
-            }
-        }
-
-        Text(
-            "QUICK LAUNCH",
-            color = AvCyan,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(7.dp)
-        ) {
-            AvQuick("Studio", "⌘", "Edit code", AvPurple) {
-                onOpen(Screen.Editor)
-            }
-
-            AvQuick("Terminal", ">_", "Run commands", AvGreen) {
-                onOpen(Screen.Terminal)
-            }
-
-            AvQuick("AI", "✦", "Coding agent", AvPink) {
-                onOpen(Screen.Copilot)
-            }
-
-            AvQuick("GitHub", "◎", "Source control", AvCyan) {
-                onOpen(Screen.GitHub)
-            }
-
-            AvQuick("System", "◈", "AvOS Center", AvCyan) {
-                onOpen(Screen.Settings)
-            }
-        }
-
-        Text(
-            "WORKSPACE STATUS",
-            color = AvCyan,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        AvFeature(
-            "Explorer",
-            "Workspace, files, folders and quick actions.",
-            "01"
-        )
-
-        AvFeature(
-            "Studio",
-            "Editor, tabs, search, command palette and preview.",
-            "02"
-        )
-
-        AvFeature(
-            "AI Agent",
-            "Natural-language coding with explicit Apply / Reject.",
-            "03"
-        )
-
-        AvFeature(
-            "Runtime",
-            "Terminal plus localhost web preview.",
-            "04"
-        )
-    }
-}
-
-@Composable
-private fun AvMetric(
-    label: String,
-    value: String,
-    modifier: Modifier
-) {
-    Column(
-        modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF101722))
-            .padding(9.dp)
-    ) {
-        Text(
-            label,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 8.sp
-        )
-
-        Text(
-            value,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-private fun AvQuick(
-    title: String,
-    icon: String,
-    subtitle: String,
-    accent: Color,
-    onClick: () -> Unit
-) {
-    Card(
-        Modifier
-            .width(132.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xE9131822)
-        ),
-        shape = RoundedCornerShape(18.dp)
-    ) {
-        Column(
-            Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
             Text(
-                icon,
-                color = accent,
-                fontSize = 21.sp
+                "AVESCODE",
+                fontWeight = FontWeight.Black,
+                fontSize = 25.sp,
+                letterSpacing = 3.sp
             )
 
             Text(
-                title,
-                fontWeight = FontWeight.Bold,
+                "Developer Studio",
+                color = Color(0xFFB8C2D1),
                 fontSize = 12.sp
             )
 
             Text(
-                subtitle,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 9.sp
+                "AvOS 16.0",
+                color = AvCyan,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                "BOOT • RUNTIME • AI • GPU",
+                color = Color(0xFF788599),
+                fontSize = 8.sp,
+                letterSpacing = 1.sp
             )
         }
     }
 }
 
 @Composable
-private fun AvFeature(
-    title: String,
-    text: String,
-    index: String
+private fun AvSystemCenter088(
+    performance: Boolean,
+    aiBoost: Boolean,
+    rgbMotion: Boolean,
+    lowPower: Boolean,
+    autoSave: Boolean,
+    safeMode: Boolean,
+    haptics: Boolean,
+    smartCache: Boolean,
+    backgroundTasks: Boolean,
+    networkAssist: Boolean,
+    compactMode: Boolean,
+    immersive: Boolean,
+    onPerformance: (Boolean) -> Unit,
+    onAiBoost: (Boolean) -> Unit,
+    onRgbMotion: (Boolean) -> Unit,
+    onLowPower: (Boolean) -> Unit,
+    onAutoSave: (Boolean) -> Unit,
+    onSafeMode: (Boolean) -> Unit,
+    onHaptics: (Boolean) -> Unit,
+    onSmartCache: (Boolean) -> Unit,
+    onBackgroundTasks: (Boolean) -> Unit,
+    onNetworkAssist: (Boolean) -> Unit,
+    onCompactMode: (Boolean) -> Unit,
+    onImmersive: (Boolean) -> Unit,
+    onDismiss: () -> Unit
 ) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xE9121720))
-            .border(
-                1.dp,
-                Color(0xFF1F2937),
-                RoundedCornerShape(16.dp)
-            )
-            .padding(11.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            index,
-            color = AvCyan,
-            fontSize = 9.sp,
-            fontWeight = FontWeight.Black
-        )
-
-        Spacer(Modifier.width(10.dp))
-
-        Column(Modifier.weight(1f)) {
-            Text(
-                title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp
-            )
-
-            Text(
-                text,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 9.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun AvSystemCenter(
-    onOpenGitHub: () -> Unit,
-    onOpenAndroidSettings: () -> Unit
-) {
-    var performance by rememberSaveable { mutableStateOf(true) }
-    var aiBoost by rememberSaveable { mutableStateOf(true) }
-    var rgbMotion by rememberSaveable { mutableStateOf(true) }
-    var reducedMotion by rememberSaveable { mutableStateOf(false) }
+    val runtime = Runtime.getRuntime()
+    val heapMb = runtime.maxMemory() / 1024L / 1024L
+    val freeMb = runtime.freeMemory() / 1024L / 1024L
+    val totalMb = runtime.totalMemory() / 1024L / 1024L
 
     val soc =
         if (Build.VERSION.SDK_INT >= 31) {
@@ -764,191 +616,194 @@ fun AvSystemCenter(
             "Device-managed"
         }
 
-    Page {
-        Text(
-            "SYSTEM CENTER",
-            color = AvCyan,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
-        )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("DONE")
+            }
+        },
+        title = {
+            Column {
+                Text(
+                    "AvOS Control Center",
+                    fontWeight = FontWeight.Black
+                )
 
-        Text(
-            "AvOS 16.0",
-            fontSize = 29.sp,
-            fontWeight = FontWeight.Black
-        )
-
-        Text(
-            "Avescode system profile, controls and runtime information.",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 11.sp
-        )
-
-        Card(
-            Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = AvCard
-            ),
-            shape = RoundedCornerShape(21.dp)
-        ) {
-            Column(
-                Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                AvRow("OS", "AvOS 16.0", AvCyan)
-                AvRow("CPU profile", "AvCPU 16.0 Compute", AvGreen)
-                AvRow("GPU profile", "AvGPU Ultra AI Max", AvPurple)
-                AvRow("AI engine", "Aves Neural Runtime", AvPink)
-                AvRow(
-                    "Target",
-                    "iOS 27-class UX / Core Ultra AI-PC UX",
-                    AvCyan
+                Text(
+                    "Avescode 0.8.8 • System Services",
+                    color = AvCyan,
+                    fontSize = 10.sp
                 )
             }
-        }
-
-        Card(
-            Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = AvCard2
-            ),
-            shape = RoundedCornerShape(20.dp)
-        ) {
+        },
+        text = {
             Column(
-                Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(7.dp)
+                Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(9.dp)
             ) {
-                Text(
-                    "ACTUAL DEVICE",
-                    color = AvCyan,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
+                AvSystemSection(
+                    "HARDWARE PROFILE",
+                    listOf(
+                        "OS" to "AvOS 16.0",
+                        "CPU" to "AvCPU 16.0 Virtual",
+                        "GPU" to "AvGPU Ultra AI Max",
+                        "AI" to "Aves Neural Runtime",
+                        "SoC" to soc,
+                        "Android" to "${Build.VERSION.RELEASE ?: "?"} / API ${Build.VERSION.SDK_INT}"
+                    )
                 )
 
-                AvRow("Device", Build.MODEL, Color.White)
-                AvRow(
-                    "Android API",
-                    Build.VERSION.SDK_INT.toString(),
-                    Color.White
-                )
-                AvRow("SoC", soc, Color.White)
-            }
-        }
-
-        Card(
-            Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = AvCard2
-            ),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column(
-                Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(1.dp)
-            ) {
-                Text(
-                    "PERFORMANCE",
-                    color = AvCyan,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
+                AvSystemSection(
+                    "MEMORY",
+                    listOf(
+                        "Heap limit" to "$heapMb MB",
+                        "Allocated" to "$totalMb MB",
+                        "Free" to "$freeMb MB"
+                    )
                 )
 
                 AvToggle(
                     "Performance mode",
                     "Prefer responsive UI",
-                    performance
-                ) { performance = it }
+                    performance,
+                    onPerformance
+                )
 
                 AvToggle(
                     "AI Boost",
-                    "Prioritize AI workflow",
-                    aiBoost
-                ) { aiBoost = it }
+                    "Prioritize Copilot workflow",
+                    aiBoost,
+                    onAiBoost
+                )
 
                 AvToggle(
                     "RGB Motion",
-                    "Animated visual shell",
-                    rgbMotion
-                ) { rgbMotion = it }
-
-                AvToggle(
-                    "Reduced motion",
-                    "Disable decorative movement",
-                    reducedMotion
-                ) { reducedMotion = it }
-            }
-        }
-
-        Card(
-            Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = AvCard2
-            ),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column(
-                Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    "SYSTEM ACTIONS",
-                    color = AvCyan,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
+                    "Animated system shell",
+                    rgbMotion,
+                    onRgbMotion
                 )
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(7.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onOpenGitHub,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("GitHub")
-                    }
+                AvToggle(
+                    "Low Power",
+                    "Reduce decorative processing",
+                    lowPower,
+                    onLowPower
+                )
 
-                    OutlinedButton(
-                        onClick = onOpenAndroidSettings,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Android")
-                    }
-                }
+                AvToggle(
+                    "Auto Save",
+                    "Prefer safe editor recovery",
+                    autoSave,
+                    onAutoSave
+                )
+
+                AvToggle(
+                    "Safe Mode",
+                    "Disable decorative system effects",
+                    safeMode,
+                    onSafeMode
+                )
+
+                AvToggle(
+                    "Haptics",
+                    "Allow tactile feedback where supported",
+                    haptics,
+                    onHaptics
+                )
+
+                AvToggle(
+                    "Smart Cache",
+                    "Prefer cached UI state",
+                    smartCache,
+                    onSmartCache
+                )
+
+                AvToggle(
+                    "Background Tasks",
+                    "Keep app-side background work available",
+                    backgroundTasks,
+                    onBackgroundTasks
+                )
+
+                AvToggle(
+                    "Network Assist",
+                    "Prefer responsive network UX",
+                    networkAssist,
+                    onNetworkAssist
+                )
+
+                AvToggle(
+                    "Compact Mode",
+                    "Denser controls for small screens",
+                    compactMode,
+                    onCompactMode
+                )
+
+                AvToggle(
+                    "Immersive UI",
+                    "Prefer edge-to-edge visual shell",
+                    immersive,
+                    onImmersive
+                )
 
                 Text(
-                    "AvOS/AvCPU/AvGPU adalah profil software Avescode; tidak mengubah CPU/GPU fisik perangkat.",
+                    "AvCPU/AvGPU adalah profil software Avescode dan tidak mengganti chip fisik perangkat.",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 9.sp
                 )
             }
-        }
-    }
+        },
+        containerColor = Color(0xF5161C26)
+    )
 }
 
 @Composable
-private fun AvRow(
-    label: String,
-    value: String,
-    accent: Color
+private fun AvSystemSection(
+    title: String,
+    rows: List<Pair<String, String>>
 ) {
-    Row(
-        Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(Color(0xFF0D131D))
+            .border(
+                1.dp,
+                Color(0xFF202B3A),
+                RoundedCornerShape(14.dp)
+            )
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
-            label,
-            Modifier.weight(0.36f),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 10.sp
+            title,
+            color = AvCyan,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Black
         )
 
-        Text(
-            value,
-            Modifier.weight(0.64f),
-            color = accent,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
-        )
+        rows.forEach { (key, value) ->
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    key,
+                    Modifier.weight(0.35f),
+                    color = Color(0xFF8D9BB0),
+                    fontSize = 9.sp
+                )
+
+                Text(
+                    value,
+                    Modifier.weight(0.65f),
+                    color = Color(0xFFE3EAF5),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
 
@@ -957,31 +812,31 @@ private fun AvToggle(
     title: String,
     subtitle: String,
     checked: Boolean,
-    onChange: (Boolean) -> Unit
+    onChecked: (Boolean) -> Unit
 ) {
     Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(Modifier.weight(1f)) {
+        Column(
+            Modifier.weight(1f)
+        ) {
             Text(
                 title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold
             )
 
             Text(
                 subtitle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 9.sp
+                fontSize = 8.sp
             )
         }
 
         Switch(
             checked = checked,
-            onCheckedChange = onChange
+            onCheckedChange = onChecked
         )
     }
 }
