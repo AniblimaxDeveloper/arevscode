@@ -65,7 +65,7 @@ enum class Screen(val label: String, val glyph: String) {
     Terminal("Terminal", "›_"),
     GitHub("GitHub", "◉"),
     Copilot("Copilot", "✦"),
-    Settings("System", "◈")
+    Settings("Settings", "⚙")
 }
 
 data class WorkspaceFile(val name: String, val uri: Uri, val directory: Boolean)
@@ -394,9 +394,9 @@ fun ArevscodeApp() {
                 onNavigate = { screen = it.name },
             ) {
                 when (Screen.valueOf(screen)) {
-                    Screen.Home -> AvescodeHomeV2(
-                        workspace = project.rootName,
-                        onOpen = { screen = it.name }
+                    Screen.Home -> HomeScreen(
+                        onOpen = { screen = it.name },
+                        workspace = project.rootName
                     )
 
                     Screen.Explorer -> ExplorerScreen(
@@ -495,17 +495,73 @@ fun ArevscodeApp() {
                         onQuick = { action -> copilotInput = action }
                     )
 
-                    Screen.Settings -> AvSystemCenter(
-                        onOpenGitHub = {
-                            screen = Screen.GitHub.name
+                    Screen.Settings -> SettingsScreen(
+                        settingsKey,
+                        settingsModel,
+                        onKey = { settingsKey = it },
+                        onModel = { settingsModel = it },
+                        onSave = {
+                            prefs.geminiKey = settingsKey.trim()
+                            prefs.model =
+                                settingsModel.trim().ifBlank { "gemini-3.5-flash" }
+                            Toast.makeText(
+                                context,
+                                "Settings tersimpan",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         },
-                        onOpenAndroidSettings = {
-                            context.startActivity(
-                                Intent(Settings.ACTION_SETTINGS)
-                            )
-                        }
+                        onSystemSettings = {}
                     )
+                }
+            }
+        }
+    }
+}
 
+@Composable
+fun ResponsiveShell(
+    screen: Screen,
+    onNavigate: (Screen) -> Unit,
+    content: @Composable () -> Unit
+) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val wide = maxWidth >= 700.dp
+
+        if (wide) {
+            Row(Modifier.fillMaxSize()) {
+                NavigationRail(
+                    containerColor = Color(0xFF0B0D13),
+                    modifier = Modifier.width(78.dp)
+                ) {
+                    Spacer(Modifier.height(16.dp))
+                    LogoMark()
+                    Spacer(Modifier.height(20.dp))
+
+                    listOf(
+                        Screen.Home,
+                        Screen.Explorer,
+                        Screen.Editor,
+                        Screen.Terminal,
+                        Screen.GitHub,
+                        Screen.Copilot,
+                        Screen.Settings
+                    ).forEach { item ->
+                        NavigationRailItem(
+                            selected = screen == item,
+                            onClick = { onNavigate(item) },
+                            icon = {
+                                Text(
+                                    item.glyph,
+                                    fontSize = 18.sp
+                                )
+                            },
+                            label = {
+                                Text(
+                                    item.label,
+                                    fontSize = 9.sp
+                                )
+                            }
+                        )
                     }
                 }
 
