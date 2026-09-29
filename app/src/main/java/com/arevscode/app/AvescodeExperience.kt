@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,18 +57,21 @@ fun AvescodeShellV2WithSplash(
 
     var showCenter by rememberSaveable { mutableStateOf(false) }
 
-    var performance by rememberSaveable { mutableStateOf(true) }
-    var aiBoost by rememberSaveable { mutableStateOf(true) }
-    var rgbMotion by rememberSaveable { mutableStateOf(true) }
-    var lowPower by rememberSaveable { mutableStateOf(false) }
-    var autoSave by rememberSaveable { mutableStateOf(true) }
-    var safeMode by rememberSaveable { mutableStateOf(false) }
-    var haptics by rememberSaveable { mutableStateOf(true) }
-    var smartCache by rememberSaveable { mutableStateOf(true) }
-    var backgroundTasks by rememberSaveable { mutableStateOf(true) }
-    var networkAssist by rememberSaveable { mutableStateOf(true) }
-    var compactMode by rememberSaveable { mutableStateOf(false) }
-    var immersive by rememberSaveable { mutableStateOf(true) }
+    val avosContext = LocalContext.current
+    val avosPrefs = remember { AvOSPreferences(avosContext) }
+
+    var performance by rememberSaveable { mutableStateOf(avosPrefs.performance) }
+    var aiBoost by rememberSaveable { mutableStateOf(avosPrefs.aiBoost) }
+    var rgbMotion by rememberSaveable { mutableStateOf(avosPrefs.rgbMotion) }
+    var lowPower by rememberSaveable { mutableStateOf(avosPrefs.lowPower) }
+    var autoSave by rememberSaveable { mutableStateOf(avosPrefs.autoSave) }
+    var safeMode by rememberSaveable { mutableStateOf(avosPrefs.safeMode) }
+    var haptics by rememberSaveable { mutableStateOf(avosPrefs.haptics) }
+    var smartCache by rememberSaveable { mutableStateOf(avosPrefs.smartCache) }
+    var backgroundTasks by rememberSaveable { mutableStateOf(avosPrefs.backgroundTasks) }
+    var networkAssist by rememberSaveable { mutableStateOf(avosPrefs.networkAssist) }
+    var compactMode by rememberSaveable { mutableStateOf(avosPrefs.compactMode) }
+    var immersive by rememberSaveable { mutableStateOf(avosPrefs.immersive) }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -133,6 +137,7 @@ fun AvescodeShellV2WithSplash(
 
         if (showCenter) {
             AvSystemCenter088(
+                context = avosContext,
                 performance = performance,
                 aiBoost = aiBoost,
                 rgbMotion = rgbMotion,
@@ -145,18 +150,18 @@ fun AvescodeShellV2WithSplash(
                 networkAssist = networkAssist,
                 compactMode = compactMode,
                 immersive = immersive,
-                onPerformance = { performance = it },
-                onAiBoost = { aiBoost = it },
-                onRgbMotion = { rgbMotion = it },
-                onLowPower = { lowPower = it },
-                onAutoSave = { autoSave = it },
-                onSafeMode = { safeMode = it },
-                onHaptics = { haptics = it },
-                onSmartCache = { smartCache = it },
-                onBackgroundTasks = { backgroundTasks = it },
-                onNetworkAssist = { networkAssist = it },
-                onCompactMode = { compactMode = it },
-                onImmersive = { immersive = it },
+                onPerformance = { performance = it; avosPrefs.performance = it },
+                onAiBoost = { aiBoost = it; avosPrefs.aiBoost = it },
+                onRgbMotion = { rgbMotion = it; avosPrefs.rgbMotion = it },
+                onLowPower = { lowPower = it; avosPrefs.lowPower = it },
+                onAutoSave = { autoSave = it; avosPrefs.autoSave = it },
+                onSafeMode = { safeMode = it; avosPrefs.safeMode = it },
+                onHaptics = { haptics = it; avosPrefs.haptics = it },
+                onSmartCache = { smartCache = it; avosPrefs.smartCache = it },
+                onBackgroundTasks = { backgroundTasks = it; avosPrefs.backgroundTasks = it },
+                onNetworkAssist = { networkAssist = it; avosPrefs.networkAssist = it },
+                onCompactMode = { compactMode = it; avosPrefs.compactMode = it },
+                onImmersive = { immersive = it; avosPrefs.immersive = it },
                 onDismiss = { showCenter = false }
             )
         }
@@ -573,6 +578,7 @@ private fun AvSplash088(onFinished: () -> Unit) {
 
 @Composable
 private fun AvSystemCenter088(
+    context: android.content.Context,
     performance: Boolean,
     aiBoost: Boolean,
     rgbMotion: Boolean,
@@ -599,28 +605,18 @@ private fun AvSystemCenter088(
     onImmersive: (Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val runtime = Runtime.getRuntime()
-    val heapMb = runtime.maxMemory() / 1024L / 1024L
-    val freeMb = runtime.freeMemory() / 1024L / 1024L
-    val totalMb = runtime.totalMemory() / 1024L / 1024L
-
-    val soc =
-        if (Build.VERSION.SDK_INT >= 31) {
-            listOf(
-                Build.SOC_MANUFACTURER,
-                Build.SOC_MODEL
-            )
-                .filter { it.isNotBlank() }
-                .joinToString(" ")
-                .ifBlank { "Device-managed" }
-        } else {
-            "Device-managed"
-        }
+    var snapshot by remember {
+        mutableStateOf(
+            AvOSSystem.snapshot(context)
+        )
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss
+            ) {
                 Text("DONE")
             }
         },
@@ -630,9 +626,8 @@ private fun AvSystemCenter088(
                     "AvOS Control Center",
                     fontWeight = FontWeight.Black
                 )
-
                 Text(
-                    "Avescode 0.8.8 • System Services",
+                    "Avescode 0.8.9 • Functional System",
                     color = AvCyan,
                     fontSize = 10.sp
                 )
@@ -640,28 +635,43 @@ private fun AvSystemCenter088(
         },
         text = {
             Column(
-                Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(9.dp)
+                Modifier.verticalScroll(
+                    rememberScrollState()
+                ),
+                verticalArrangement =
+                    Arrangement.spacedBy(8.dp)
             ) {
                 AvSystemSection(
-                    "HARDWARE PROFILE",
+                    "LIVE DEVICE",
                     listOf(
-                        "OS" to "AvOS 16.0",
-                        "CPU" to "AvCPU 16.0 Virtual",
-                        "GPU" to "AvGPU Ultra AI Max",
-                        "AI" to "Aves Neural Runtime",
-                        "SoC" to soc,
-                        "Android" to "${Build.VERSION.RELEASE ?: "?"} / API ${Build.VERSION.SDK_INT}"
+                        "Device" to snapshot.device,
+                        "Android" to
+                            "${snapshot.android} / API ${snapshot.api}",
+                        "SoC" to snapshot.soc,
+                        "CPU cores" to
+                            snapshot.cpuCores.toString(),
+                        "Battery" to snapshot.battery,
+                        "Network" to snapshot.network,
+                        "Storage" to snapshot.storage,
+                        "RAM" to snapshot.ram
                     )
                 )
 
                 AvSystemSection(
-                    "MEMORY",
+                    "AVOS PROFILE",
                     listOf(
-                        "Heap limit" to "$heapMb MB",
-                        "Allocated" to "$totalMb MB",
-                        "Free" to "$freeMb MB"
+                        "OS" to "AvOS 16.0",
+                        "CPU" to "AvCPU 16.0 Virtual",
+                        "GPU" to "AvGPU Ultra AI Max",
+                        "AI" to "Aves Neural Runtime"
                     )
+                )
+
+                Text(
+                    "RUNTIME CONTROLS",
+                    color = AvCyan,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Black
                 )
 
                 AvToggle(
@@ -708,7 +718,7 @@ private fun AvSystemCenter088(
 
                 AvToggle(
                     "Haptics",
-                    "Allow tactile feedback where supported",
+                    "Allow supported tactile feedback",
                     haptics,
                     onHaptics
                 )
@@ -749,8 +759,149 @@ private fun AvSystemCenter088(
                 )
 
                 Text(
-                    "AvCPU/AvGPU adalah profil software Avescode dan tidak mengganti chip fisik perangkat.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    "SYSTEM ACTIONS",
+                    color = AvCyan,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Black
+                )
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openAndroidSettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Android")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openWifiSettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Wi-Fi")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openDisplaySettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Display")
+                    }
+                }
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openBatterySettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Battery")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openAppInfo(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("App info")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.openDeveloperSettings(
+                                context
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Developer")
+                    }
+                }
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.shareDiagnostics(
+                                context,
+                                snapshot
+                            )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Diagnostics")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            AvOSSystem.clearAppCache(
+                                context
+                            )
+                            snapshot =
+                                AvOSSystem.snapshot(
+                                    context
+                                )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Clear cache")
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            snapshot =
+                                AvOSSystem.snapshot(
+                                    context
+                                )
+                        },
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text("Refresh")
+                    }
+                }
+
+                Text(
+                    "AvCPU/AvGPU adalah profil software Avescode; APK tetap berjalan pada hardware Android asli.",
+                    color =
+                        MaterialTheme.colorScheme
+                            .onSurfaceVariant,
                     fontSize = 9.sp
                 )
             }
@@ -759,7 +910,6 @@ private fun AvSystemCenter088(
     )
 }
 
-@Composable
 private fun AvSystemSection(
     title: String,
     rows: List<Pair<String, String>>
