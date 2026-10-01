@@ -487,7 +487,7 @@ private fun TopBar(
     onPalette: () -> Unit
 ) {
     Row(
-        modifier
+        Modifier
             .fillMaxWidth()
             .background(
                 Brush.horizontalGradient(
@@ -534,7 +534,7 @@ private fun Explorer(
     onDelete: (Uri) -> Unit
 ) {
     Column(
-        modifier
+        Modifier
             .fillMaxSize()
             .background(Bg)
     ) {
@@ -638,7 +638,7 @@ private fun Editor(
     onPreview: () -> Unit
 ) {
     Column(
-        modifier
+        Modifier
             .fillMaxSize()
             .background(Bg)
     ) {
@@ -693,7 +693,7 @@ private fun Terminal(
     var command by remember { mutableStateOf("") }
 
     Column(
-        modifier
+        Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
@@ -771,7 +771,7 @@ private fun EmptyState(
     action: () -> Unit
 ) {
     Column(
-        modifier
+        Modifier
             .fillMaxSize()
             .padding(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -902,12 +902,13 @@ private fun PaletteButton(
 }
 
 @Composable
+@Composable
 private fun IdeBottomBar(
     selected: Tool,
     onSelect: (Tool) -> Unit
 ) {
     Row(
-        modifier
+        Modifier
             .fillMaxWidth()
             .background(Color(0xFF090D13))
             .navigationBarsPadding()
@@ -916,34 +917,33 @@ private fun IdeBottomBar(
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         ToolBottomButton(
-            selected == Tool.EXPLORER,
-            modifier = Modifier.weight(1f),
-            "⌁",
-            "Explorer"
+            selected = selected == Tool.EXPLORER,
+            icon = "⌁",
+            label = "Explorer",
+            modifier = Modifier.weight(1f)
         ) {
             onSelect(Tool.EXPLORER)
         }
 
         ToolBottomButton(
-            selected == Tool.EDITOR,
-            modifier = Modifier.weight(1f),
-            "</>",
-            "Editor"
+            selected = selected == Tool.EDITOR,
+            icon = "</>",
+            label = "Editor",
+            modifier = Modifier.weight(1f)
         ) {
             onSelect(Tool.EDITOR)
         }
 
         ToolBottomButton(
-            selected == Tool.TERMINAL,
-            modifier = Modifier.weight(1f),
-            ">_",
-            "Terminal"
+            selected = selected == Tool.TERMINAL,
+            icon = ">_",
+            label = "Terminal",
+            modifier = Modifier.weight(1f)
         ) {
             onSelect(Tool.TERMINAL)
         }
     }
 }
-
 @Composable
 private fun ToolBottomButton(
     selected: Boolean,
