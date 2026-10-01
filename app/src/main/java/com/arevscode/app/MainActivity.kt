@@ -57,7 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SolidColor
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -487,7 +487,7 @@ private fun TopBar(
     onPalette: () -> Unit
 ) {
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .background(
                 Brush.horizontalGradient(
@@ -534,7 +534,7 @@ private fun Explorer(
     onDelete: (Uri) -> Unit
 ) {
     Column(
-        Modifier
+        modifier
             .fillMaxSize()
             .background(Bg)
     ) {
@@ -638,7 +638,7 @@ private fun Editor(
     onPreview: () -> Unit
 ) {
     Column(
-        Modifier
+        modifier
             .fillMaxSize()
             .background(Bg)
     ) {
@@ -693,7 +693,7 @@ private fun Terminal(
     var command by remember { mutableStateOf("") }
 
     Column(
-        Modifier
+        modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
@@ -771,7 +771,7 @@ private fun EmptyState(
     action: () -> Unit
 ) {
     Column(
-        Modifier
+        modifier
             .fillMaxSize()
             .padding(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -888,6 +888,7 @@ private fun CommandPalette(
 @Composable
 private fun PaletteButton(
     label: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     OutlinedButton(
@@ -906,7 +907,7 @@ private fun IdeBottomBar(
     onSelect: (Tool) -> Unit
 ) {
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .background(Color(0xFF090D13))
             .navigationBarsPadding()
@@ -916,6 +917,7 @@ private fun IdeBottomBar(
     ) {
         ToolBottomButton(
             selected == Tool.EXPLORER,
+            modifier = Modifier.weight(1f),
             "⌁",
             "Explorer"
         ) {
@@ -924,6 +926,7 @@ private fun IdeBottomBar(
 
         ToolBottomButton(
             selected == Tool.EDITOR,
+            modifier = Modifier.weight(1f),
             "</>",
             "Editor"
         ) {
@@ -932,6 +935,7 @@ private fun IdeBottomBar(
 
         ToolBottomButton(
             selected == Tool.TERMINAL,
+            modifier = Modifier.weight(1f),
             ">_",
             "Terminal"
         ) {
@@ -945,10 +949,11 @@ private fun ToolBottomButton(
     selected: Boolean,
     icon: String,
     label: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Column(
-        Modifier
+        modifier
             .weight(1f)
             .clickable(onClick = onClick)
             .background(
