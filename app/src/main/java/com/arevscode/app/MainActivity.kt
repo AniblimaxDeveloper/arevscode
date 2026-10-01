@@ -199,7 +199,11 @@ private class WorkspaceStore(private val context: Context) {
         runCatching { DocumentFile.fromSingleUri(context, uri)?.delete() == true }.getOrDefault(false)
 
     fun fileName(uri: Uri?): String =
-        DocumentFile.fromSingleUri(context, uri ?: return Uri.EMPTY)?.name ?: "Untitled"
+        if (uri == null) {
+            "Untitled"
+        } else {
+            DocumentFile.fromSingleUri(context, uri)?.name ?: "Untitled"
+        }
 }
 
 private class TerminalEngine(context: Context) {
