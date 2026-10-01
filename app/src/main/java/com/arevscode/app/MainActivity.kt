@@ -36,8 +36,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -310,14 +308,10 @@ private fun AvescodeIDE() {
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = Color(0xFF090D13),
-                modifier = Modifier.navigationBarsPadding()
-            ) {
-                ToolNavItem(tool, Tool.EXPLORER) { tool = Tool.EXPLORER }
-                ToolNavItem(tool, Tool.EDITOR) { tool = Tool.EDITOR }
-                ToolNavItem(tool, Tool.TERMINAL) { tool = Tool.TERMINAL }
-            }
+            IdeBottomBar(
+                selected = tool,
+                onSelect = { tool = it }
+            )
         }
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
@@ -386,409 +380,70 @@ private fun AvescodeIDE() {
 }
 
 @Composable
-private fun ToolNavItem(
+private fun IdeBottomBar(
     selected: Tool,
-    tool: Tool,
-    onClick: () -> Unit
+    onSelect: (Tool) -> Unit
 ) {
-    NavigationBarItem(
-        selected = selected == tool,
-        onClick = onClick,
-        icon = {
-            Text(
-                when (tool) {
-                    Tool.EXPLORER -> "⌁"
-                    Tool.EDITOR -> "</>"
-                    Tool.TERMINAL -> ">_"
-                }
-            )
-        },
-        label = { Text(tool.label) }
-    )
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF090D13))
+            .navigationBarsPadding()
+            .border(1.dp, Line)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ToolBottomButton(
+            selected = selected == Tool.EXPLORER,
+            icon = "⌁",
+            label = "Explorer",
+            onClick = { onSelect(Tool.EXPLORER) }
+        )
+        ToolBottomButton(
+            selected = selected == Tool.EDITOR,
+            icon = "</>",
+            label = "Editor",
+            onClick = { onSelect(Tool.EDITOR) }
+        )
+        ToolBottomButton(
+            selected = selected == Tool.TERMINAL,
+            icon = ">_",
+            label = "Terminal",
+            onClick = { onSelect(Tool.TERMINAL) }
+        )
+    }
 }
 
 @Composable
-private fun TopBar(
-    workspace: String,
-    tool: Tool,
-    onOpen: () -> Unit,
-    onPalette: () -> Unit
+private fun ToolBottomButton(
+    selected: Boolean,
+    icon: String,
+    label: String,
+    onClick: () -> Unit
 ) {
     Column(
         Modifier
+            .weight(1f)
+            .clickable(onClick = onClick)
             .background(
-                Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFF07141D),
-                        Color(0xFF141024),
-                        Color(0xFF090D14)
-                    )
-                )
+                if (selected) Color(0xFF172333) else Color.Transparent,
+                RoundedCornerShape(12.dp)
             )
-            .border(1.dp, Line)
+            .padding(vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 9.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("</>", color = Cyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black)
-            Spacer(Modifier.width(8.dp))
-            Column(Modifier.weight(1f)) {
-                Text("Avescode", fontSize = 18.sp, fontWeight = FontWeight.Black)
-                Text("$workspace • ${tool.label}", fontSize = 9.sp, color = TextDim)
-            }
-            TextButton(onClick = onOpen) { Text("Open") }
-            TextButton(onClick = onPalette) { Text("⌘") }
-        }
+        Text(
+            icon,
+            color = if (selected) Cyan else TextDim,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Black,
+            fontSize = 12.sp
+        )
+        Text(
+            label,
+            color = if (selected) Cyan else TextDim,
+            fontSize = 9.sp
+        )
     }
 }
-
-@Composable
-private fun Explorer(
-    workspace: WorkspaceStore,
-    onOpenWorkspace: () -> Unit,
-    onOpen: (WorkspaceItem) -> Unit,
-    onNewFile: () -> Unit,
-    onNewFolder: () -> Unit,
-    onUp: () -> Unit
-) {
-    Column(Modifier.fillMaxSize().padding(12.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            OutlinedButton(onClick = onOpenWorkspace) { Text("Open Workspace") }
-            OutlinedButton(onClick = onNewFile, enabled = workspace.rootUri != null) { Text("+ File") }
-            OutlinedButton(onClick = onNewFolder, enabled = workspace.rootUri != null) { Text("+ Folder") }
-        }
-
-        Spacer(Modifier.height(10.dp))
-
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Panel),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                Text("WORKSPACE", color = Cyan, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                Text(workspace.rootName, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                Text("SAF folder access • no broad storage permission", color = TextDim, fontSize = 9.sp)
-            }
-        }
-
-        Spacer(Modifier.height(10.dp))
-
-        if (workspace.rootUri == null) {
-            EmptyPanel(
-                "Open a project",
-                "Avescode is now focused on the VS Code + Termux workflow.",
-                onOpenWorkspace
-            )
-        } else {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("FILES", color = Cyan, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                TextButton(onClick = onUp) { Text("..") }
-            }
-
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                items(workspace.items(), key = { it.uri.toString() }) { item ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .background(Panel2, RoundedCornerShape(12.dp))
-                            .border(1.dp, Line, RoundedCornerShape(12.dp))
-                            .clickable { onOpen(item) }
-                            .padding(horizontal = 10.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(if (item.directory) "📁" else "▣")
-                        Spacer(Modifier.width(9.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(item.name, fontWeight = FontWeight.SemiBold)
-                            Text(if (item.directory) "folder" else languageOf(item.name), color = TextDim, fontSize = 9.sp)
-                        }
-                        TextButton(onClick = { workspace.delete(item.uri) }) {
-                            Text("×", color = Color(0xFFFF6A80), fontSize = 18.sp)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun Editor(
-    fileName: String,
-    code: String,
-    dirty: Boolean,
-    onChange: (String) -> Unit,
-    onSave: () -> Unit,
-    onPreview: () -> Unit
-) {
-    Column(Modifier.fillMaxSize()) {
-        Row(
-            Modifier.fillMaxWidth().background(Panel).padding(5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(fileName, Modifier.weight(1f), fontWeight = FontWeight.Bold)
-            Text(if (dirty) "● modified" else "saved", color = if (dirty) Color(0xFFFFC857) else Green, fontSize = 9.sp)
-            TextButton(onClick = onSave) { Text("Save") }
-            if (fileName.endsWith(".html", true)) {
-                TextButton(onClick = onPreview) { Text("Run") }
-            }
-        }
-
-        Row(
-            Modifier.fillMaxWidth().background(Color(0xFF0A0F16)).horizontalScroll(rememberScrollState()).padding(6.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            listOf("CTRL", "SHIFT", "ALT", "ESC", "TAB", "CTRL+S", "CTRL+F", "CTRL+Z", "CTRL+Y").forEach {
-                Surface(color = Color(0xFF141D28), shape = RoundedCornerShape(7.dp)) {
-                    Text(it, Modifier.padding(horizontal = 7.dp, vertical = 3.dp), color = TextDim, fontSize = 8.sp)
-                }
-            }
-        }
-
-        Box(Modifier.fillMaxSize().background(Color(0xFF080B10)).padding(8.dp)) {
-            BasicTextField(
-                value = code,
-                onValueChange = onChange,
-                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                textStyle = TextStyle(
-                    color = TextMain,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 13.sp,
-                    lineHeight = 19.sp
-                ),
-                decorationBox = { inner ->
-                    Row(Modifier.fillMaxSize()) {
-                        val count = maxOf(1, code.count { it == '\n' } + 1)
-                        Column {
-                            repeat(count) {
-                                Text("${it + 1}", color = Color(0xFF4C596B), fontFamily = FontFamily.Monospace, fontSize = 11.sp, lineHeight = 19.sp)
-                            }
-                        }
-                        Spacer(Modifier.width(10.dp))
-                        Box(Modifier.fillMaxSize()) { inner() }
-                    }
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun Terminal(
-    lines: List<String>,
-    terminal: TerminalEngine,
-    onLines: (List<String>) -> Unit
-) {
-    var command by remember { mutableStateOf("") }
-
-    Column(Modifier.fillMaxSize().background(Color(0xFF030506))) {
-        Row(Modifier.fillMaxWidth().background(Panel).padding(9.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(">_", color = Green, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black)
-            Spacer(Modifier.width(8.dp))
-            Column {
-                Text("Terminal", fontWeight = FontWeight.Bold)
-                Text(terminal.pwd(), color = TextDim, fontFamily = FontFamily.Monospace, fontSize = 8.sp)
-            }
-        }
-
-        Column(
-            Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(10.dp)
-        ) {
-            lines.forEach {
-                Text(
-                    it,
-                    color = if (it.startsWith("Avescode")) Cyan else Color(0xFFD3D9E3),
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp
-                )
-            }
-        }
-
-        Row(
-            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp, vertical = 3.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            listOf("ls", "pwd", "git status", "cd ..", "clear").forEach { cmd ->
-                OutlinedButton(onClick = { command = cmd }) {
-                    Text(cmd, fontFamily = FontFamily.Monospace, fontSize = 9.sp)
-                }
-            }
-        }
-
-        Row(
-            Modifier.fillMaxWidth().padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("$ ", color = Green, fontFamily = FontFamily.Monospace)
-            BasicTextField(
-                value = command,
-                onValueChange = { command = it },
-                modifier = Modifier.weight(1f),
-                textStyle = TextStyle(color = TextMain, fontFamily = FontFamily.Monospace, fontSize = 13.sp),
-                singleLine = true
-            )
-            TextButton(
-                onClick = {
-                    val result = terminal.run(command)
-                    if (result == "__CLEAR__") {
-                        onLines(emptyList())
-                    } else {
-                        onLines(lines + listOf("$ $command", result))
-                    }
-                    command = ""
-                }
-            ) { Text("Run") }
-        }
-    }
-}
-
-@Composable
-private fun EmptyPanel(title: String, body: String, action: () -> Unit) {
-    Card(colors = CardDefaults.cardColors(containerColor = Panel), shape = RoundedCornerShape(18.dp)) {
-        Column(
-            Modifier.fillMaxWidth().padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("</>", color = Cyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 32.sp)
-            Spacer(Modifier.height(8.dp))
-            Text(title, fontWeight = FontWeight.Black, fontSize = 18.sp)
-            Spacer(Modifier.height(6.dp))
-            Text(body, color = TextDim, fontSize = 10.sp)
-            Spacer(Modifier.height(12.dp))
-            Button(onClick = action) { Text("Open Workspace") }
-        }
-    }
-}
-
-@Composable
-private fun NameDialog(
-    title: String,
-    initial: String,
-    confirm: String,
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    var value by remember { mutableStateOf(initial) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = {
-            OutlinedTextField(
-                value = value,
-                onValueChange = { value = it },
-                singleLine = true,
-                label = { Text("Name") }
-            )
-        },
-        confirmButton = {
-            Button(onClick = { onConfirm(value) }) { Text(confirm) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
-        }
-    )
-}
-
-@Composable
-private fun CommandPalette(
-    onExplorer: () -> Unit,
-    onEditor: () -> Unit,
-    onTerminal: () -> Unit,
-    onNewFile: () -> Unit,
-    onOpen: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Command Palette") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                listOf(
-                    "Explorer" to onExplorer,
-                    "Editor" to onEditor,
-                    "Terminal" to onTerminal,
-                    "New File" to onNewFile,
-                    "Open Workspace" to onOpen
-                ).forEach { (label, action) ->
-                    OutlinedButton(onClick = action, modifier = Modifier.fillMaxWidth()) {
-                        Text(label)
-                    }
-                }
-            }
-        },
-        confirmButton = {}
-    )
-}
-
-@Composable
-private fun WebPreview(
-    html: String,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Web Preview") },
-        text = {
-            AndroidView(
-                factory = { context ->
-                    WebView(context).apply {
-                        webViewClient = WebViewClient()
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                    }
-                },
-                update = {
-                    it.loadDataWithBaseURL(
-                        null,
-                        html,
-                        "text/html",
-                        "UTF-8",
-                        null
-                    )
-                },
-                modifier = Modifier.fillMaxWidth().height(420.dp)
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
-        }
-    )
-}
-
-private fun languageOf(name: String): String =
-    when {
-        name.endsWith(".kt", true) -> "Kotlin"
-        name.endsWith(".java", true) -> "Java"
-        name.endsWith(".js", true) -> "JavaScript"
-        name.endsWith(".ts", true) -> "TypeScript"
-        name.endsWith(".html", true) -> "HTML"
-        name.endsWith(".css", true) -> "CSS"
-        name.endsWith(".json", true) -> "JSON"
-        name.endsWith(".xml", true) -> "XML"
-        name.endsWith(".py", true) -> "Python"
-        name.endsWith(".sh", true) -> "Shell"
-        name.endsWith(".md", true) -> "Markdown"
-        else -> "Text"
-    }
-
-private const val WELCOME = """
-# Avescode
-
-Focused mobile coding workspace.
-
-Core:
-- Explorer
-- Editor
-- Terminal
-- Command Palette
-- HTML Preview
-- Workspace file/folder management
-
-Open a project folder to start.
-"""
