@@ -11,8 +11,8 @@ android {
         applicationId = "com.arevscode.app"
         minSdk = 26
         targetSdk = 37
-        versionCode = 20
-        versionName = "0.9.0"
+        versionCode = 21
+        versionName = "0.9.1"
     }
 
     buildTypes {
@@ -46,9 +46,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3.adaptive:adaptive")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("androidx.documentfile:documentfile:1.1.0")
-    implementation("com.squareup.okhttp3:okhttp:5.5.0")
 }
